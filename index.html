@@ -3,16 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShrinIt-Compress and Encrypt</title>
+    <title>ShrinkIt - Smart File Compression & Encryption</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <label for="fileInput">Select a file:</label>
-    <input type="file" id="fileInput" accept=".shrkt, .txt, .png, .jpg, .jpeg, .pdf">
-    <button id="compressBtn">Compress</button>
-    <button id="decompressBtn">Decompress</button>
-    <a id="downloadLink" style="display: none;" download>Download</a>
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">ShrinkIt</a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
 
+    <main class="container">
+        <div class="hero-section" >
+            <div class="hero-content">
+                <h1>Compress & Protect Your Files</h1>
+                <p>Secure, fast, and efficient file compression with military-grade encryption</p>
+                
+                <div class="upload-section">
+                    <div class="file-drop-zone" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & Drop files here or</p>
+                        <label for="fileInput" class="btn-primary">Browse Files</label>
+                        <input type="file" id="fileInput" accept=".shrkt, .txt, .png, .jpg, .jpeg, .pdf">
+                    </div>
+                    <div class="file-types">
+                        <span><i class="fas fa-file-pdf"></i> PDF</span>
+                        <span><i class="fas fa-image"></i> Images</span>
+                        <span><i class="fas fa-file-text"></i> Text</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="compressBtn" class="btn-success">
+                        <i class="fas fa-compress"></i> Compress
+                    </button>
+                    <button id="decompressBtn" class="btn-info">
+                        <i class="fas fa-expand"></i> Decompress
+                    </button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://img.freepik.com/free-vector/futuristic-background-abstract-design_23-2148503799.jpg?t=st=1743394871~exp=1743398471~hmac=c8e01a6de2494c1f1ab4a1a87490b9956e861a5f57e4a4c6f6fcd688b3a4514f&w=1380" alt="File Compression Illustration" width="500" height="300">
+            </div>
+        </div>
+
+        <section id="features" class="features">
+            <h2>Why Choose ShrinkIt?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Military-Grade Encryption</h3>
+                    <p>AES-256 encryption for maximum security</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-rocket"></i>
+                    <h3>Fast Processing</h3>
+                    <p>Optimized algorithms for quick compression</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-file-archive"></i>
+                    <h3>Multi-Format Support</h3>
+                    <p>PDF, Images, Text, and more</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 ShrinkIt. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <a id="downloadLink" class="download-btn" style="display: none;" download>
+        <i class="fas fa-download"></i> Download File
+    </a>
 
     <script src="main.js"></script>
     <script src="ui.js"></script>
