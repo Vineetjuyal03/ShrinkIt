@@ -92,7 +92,8 @@ function handleFileCompression(file) {
         };
 
         const metadataJSON = JSON.stringify(metadata);
-        const finalData = metadataJSON + '\n' + charString;
+        const customDelimiter = "@@@SHRINKIT_DELIMITER@@@";
+        const finalData = metadataJSON + customDelimiter + charString;
 
         const blob = new Blob([finalData], { type: 'application/octet-stream' });
         const downloadLink = document.getElementById("downloadLink");
@@ -114,10 +115,12 @@ function charStringToBinary(charString, padding) {
         let binarySegment = charString.charCodeAt(i).toString(2).padStart(8, '0');
         binaryString += binarySegment;
     }
-
-    // Remove the extra padding bits
-    return binaryString.slice(0, -padding);
+    if (padding > 0 && padding < binaryString.length) {
+        binaryString = binaryString.slice(0, -padding);
+    }
+    return binaryString;
 }
+
 function decodeBinary(binaryString, decodeMap) {
     let decodedText = '';
     let currentCode = '';
@@ -126,7 +129,7 @@ function decodeBinary(binaryString, decodeMap) {
         currentCode += bit;
         if (decodeMap[currentCode]) {
             decodedText += decodeMap[currentCode];
-            currentCode = ''; // Reset for the next character
+            currentCode = '';
         }
     }
 
@@ -144,7 +147,7 @@ function handleFileDecompression(file) {
         const fileContent = event.target.result;
 
         // Split metadata and compressed data
-        const [metadataJSON, compressedData] = fileContent.split('\n', 2);
+        const [metadataJSON, compressedData] = fileContent.split("@@@SHRINKIT_DELIMITER@@@");
 
         if (!metadataJSON || !compressedData) {
             alert("Invalid compressed file format!");
