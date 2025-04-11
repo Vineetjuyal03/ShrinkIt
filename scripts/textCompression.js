@@ -1,16 +1,3 @@
-const customDelimiter = "|~|";
-const shortToFullType = {
-    "txt": "text/plain",
-    "jpg": "image/jpeg",
-    "png": "image/png",
-    "pdf": "application/pdf"
-};
-const fullToShortType = {
-    "text/plain": "txt",
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "application/pdf": "pdf"
-};
 class HuffmanNode {
     constructor(char, freq, left = null, right = null) {
         this.char = char;
@@ -58,83 +45,97 @@ function generateCodes(root) {
     traverse(root, '');
     return codes;
 }
+function binToDeci(codes) {
+    const compactList = [];
+    for (const char in codes) {
+        const binary = codes[char];
+        const length = binary.length;
+        const decimal = parseInt(binary, 2);
+        const charCode = char.charCodeAt(0);
+        compactList.push([charCode, length, decimal]);
+    }
+    return compactList;
+}
+function deciToBin(compactList) {
+    const decodeMap = {};
+    for (const [charCode, length, decimalValue] of compactList) {
+        const binaryCode = Number(decimalValue).toString(2).padStart(length, '0');
+        const character = String.fromCharCode(charCode);
+        decodeMap[binaryCode] = character;
+    }
+    return decodeMap;
+}
 function compressText(inputText) {
     const frequencyMap = getFrequencies(inputText);
     const root = buildHuffmanTree(frequencyMap);
     const codes = generateCodes(root);
 
-    const decodeMap = {};
-    for (const char in codes) {
-        decodeMap[codes[char]] = char;
-    }
+    const CompactCodeMap = binToDeci(codes);
 
     const compressedBinary = inputText.split('').map(char => codes[char]).join('');
-    return { compressedBinary, decodeMap };
+    return { compressedBinary, CompactCodeMap };
 }
-function binaryToCharString(binaryString) {
+function binaryToUint8Array(binaryString) {
     let padding = 0;
     if (binaryString.length % 8 !== 0) {
         padding = 8 - (binaryString.length % 8);
         binaryString += '0'.repeat(padding);
     }
 
-    let compressedString = '';
+    const byteArray = new Uint8Array(binaryString.length / 8);
     for (let i = 0; i < binaryString.length; i += 8) {
         const byte = binaryString.slice(i, i + 8);
-        compressedString += String.fromCharCode(parseInt(byte, 2));
+        byteArray[i / 8] = parseInt(byte, 2);
     }
 
-    return { charString: compressedString, padding };
+    return { byteArray, padding };
 }
+
 function handleFileCompression(file) {
     const reader = new FileReader();
 
     reader.onload = function (event) {
         const inputText = event.target.result;
-        if (inputText.length === 0) {  // Check for truly empty files
+        if (inputText.length === 0) {
             alert("Error: The file is empty.");
             return;
         }
-        const { compressedBinary, decodeMap } = compressText(inputText);
-        const { charString, padding } = binaryToCharString(compressedBinary);
+
+        const { compressedBinary, CompactCodeMap } = compressText(inputText);
+        const { byteArray, padding } = binaryToUint8Array(compressedBinary);
+
         const metadata = {
-            header: "SHRINKIT",
-            padding: padding,
-            fileType: file.type,
-            decodeMap: decodeMap
+            fT: fullToShortType[file.type],
+            pad: padding,
+            dMp: CompactCodeMap
         };
 
         const metadataJSON = JSON.stringify(metadata);
-        const customDelimiter = "@@@SHRINKIT_DELIMITER@@@";
-        const finalData = metadataJSON + customDelimiter + charString;
+        const metadataBytes = new TextEncoder().encode(metadataJSON + customDelimiter);
 
-        const blob = new Blob([finalData], { type: 'application/octet-stream' });
+        const finalBuffer = new Uint8Array(metadataBytes.length + byteArray.length);
+        finalBuffer.set(metadataBytes, 0);
+        finalBuffer.set(byteArray, metadataBytes.length);
+
+        const blob = new Blob([finalBuffer], { type: 'application/octet-stream' });
         const downloadLink = document.getElementById("downloadLink");
         downloadLink.href = URL.createObjectURL(blob);
-        let filename=file.name;
+        let filename = file.name;
         downloadLink.download = filename.replace(/\.[^/.]+$/, "") + '.shrkt';
         downloadLink.style.display = "block";
-        downloadLink.click();  // Auto-trigger the download
+        downloadLink.click();
+        document.getElementById("fileInput").value = '';
     };
     reader.readAsText(file);
 }
 
 
+
 // Decompression
-function charStringToBinary(charString, padding) {
-    let binaryString = '';
 
-    for (let i = 0; i < charString.length; i++) {
-        let binarySegment = charString.charCodeAt(i).toString(2).padStart(8, '0');
-        binaryString += binarySegment;
-    }
-    if (padding > 0 && padding < binaryString.length) {
-        binaryString = binaryString.slice(0, -padding);
-    }
-    return binaryString;
-}
 
-function decodeBinary(binaryString, decodeMap) {
+function decodeBinary(binaryString, compactCodeMap) {
+    let decodeMap=deciToBin(compactCodeMap);
     let decodedText = '';
     let currentCode = '';
 
@@ -148,40 +149,47 @@ function decodeBinary(binaryString, decodeMap) {
 
     return decodedText;
 }
-function decompressText(metadata, compressedData) {
-    const binaryString = charStringToBinary(compressedData, metadata.padding);
-    const originalText = decodeBinary(binaryString, metadata.decodeMap);
-    return originalText;
-}
 function handleFileDecompression(file) {
     const reader = new FileReader();
 
     reader.onload = function (event) {
-        const fileContent = event.target.result;
+        const arrayBuffer = event.target.result;
+        const fullData = new Uint8Array(arrayBuffer);
 
-        // Split metadata and compressed data
-        const [metadataJSON, compressedData] = fileContent.split("@@@SHRINKIT_DELIMITER@@@");
+        const decoder = new TextDecoder();
+        const decodedText = decoder.decode(fullData);
 
-        if (!metadataJSON || !compressedData) {
+        const delimiterIndex = decodedText.indexOf(customDelimiter);
+        if (delimiterIndex === -1) {
             alert("Invalid compressed file format!");
             return;
         }
 
+        const metadataJSON = decodedText.slice(0, delimiterIndex);
         const metadata = JSON.parse(metadataJSON);
-        const decompressedText = decompressText(metadata, compressedData);
 
-        // Generate original filename
-        const originalFilename = file.name.replace(/\.shrkt$/, '') + metadata.fileType;
+        const compressedStartIndex = new TextEncoder().encode(metadataJSON + customDelimiter).length;
+        const compressedBytes = fullData.slice(compressedStartIndex);
 
-        // Use the existing download button
+        const binaryString = [...compressedBytes].map(byte =>
+            byte.toString(2).padStart(8, '0')).join('');
+
+        const trimmedBinary = metadata.pad
+            ? binaryString.slice(0, -metadata.pad)
+            : binaryString;
+
+        const decompressedText = decodeBinary(trimmedBinary, metadata.dMp);
+
+        const originalFilename = file.name.replace(/\.shrkt$/, '') + '.' + metadata.fT;
         const downloadLink = document.getElementById("downloadLink");
-        const blob = new Blob([decompressedText], { type: metadata.fileType });
-
+        const blob = new Blob([decompressedText], { type: shortToFullType[metadata.fT] });
         downloadLink.href = URL.createObjectURL(blob);
         downloadLink.download = originalFilename;
-        downloadLink.style.display = "block";  // Ensure the button is visible
-        downloadLink.click();  // Auto-trigger download
+        downloadLink.style.display = "block";
+        downloadLink.click();
+        document.getElementById("fileInput").value = '';
     };
 
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
 }
+
