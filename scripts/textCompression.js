@@ -1,3 +1,16 @@
+const customDelimiter = "|~|";
+const shortToFullType = {
+    "txt": "text/plain",
+    "jpg": "image/jpeg",
+    "png": "image/png",
+    "pdf": "application/pdf"
+};
+const fullToShortType = {
+    "text/plain": "txt",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "application/pdf": "pdf"
+};
 class HuffmanNode {
     constructor(char, freq, left = null, right = null) {
         this.char = char;
