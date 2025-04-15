@@ -1,17 +1,15 @@
 const customDelimiter = "|~|";
+
 const shortToFullType = {
     "txt": "text/plain",
-    "jpg": "image/jpeg",
-    "png": "image/png",
     "pdf": "application/pdf"
 };
+
 const fullToShortType = {
     "text/plain": "txt",
-    "image/jpeg": "jpg",
-    "image/png": "png",
     "application/pdf": "pdf"
 };
-document.getElementById("compressBtn").addEventListener("click", function () {
+document.getElementById("compressBtn").addEventListener("click", async function () {
     const fileInput = document.getElementById("fileInput");
     if (fileInput.files.length === 0) {
         alert("Please select a file first!");
@@ -26,11 +24,12 @@ document.getElementById("compressBtn").addEventListener("click", function () {
     } else if (fileType.startsWith("image/")) {
         handleImageCompression(file);
     } else if (fileType === "application/pdf") {
-        handlePDFCompression(file);
+        await handlePDFCompression(file); 
     } else {
         alert("Unsupported file type!");
     }
 });
+
 document.getElementById("decompressBtn").addEventListener("click", function () {
     const fileInput = document.getElementById("fileInput");
     if (fileInput.files.length === 0) {
@@ -39,8 +38,6 @@ document.getElementById("decompressBtn").addEventListener("click", function () {
     }
 
     const file = fileInput.files[0];
-
-    // Check if file has the correct extension
     if (!file.name.endsWith(".shrkt")) {
         alert("Invalid file type! Please select a '.shrkt' compressed file.");
         return;
@@ -72,18 +69,9 @@ document.getElementById("decompressBtn").addEventListener("click", function () {
             alert("Missing file type information in compressed file!");
             return;
         }
-
-        // Call appropriate decompression function based on file type
         switch (metadata.fT) {
             case "txt":
-                handleFileDecompression(file); // text decompression
-                break;
-            case "jpg":
-            case "png":
-                handleImageDecompression(file); // hypothetical function for images
-                break;
-            case "pdf":
-                handlePdfDecompression(file); // hypothetical function for PDFs
+                handleFileDecompression(file);
                 break;
             default:
                 alert("Unsupported file type in compressed file: " + metadata.fT);
@@ -92,5 +80,3 @@ document.getElementById("decompressBtn").addEventListener("click", function () {
 
     reader.readAsArrayBuffer(file);
 });
-
-

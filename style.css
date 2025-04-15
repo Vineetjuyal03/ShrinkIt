@@ -50,7 +50,8 @@ body {
 
 /* Hero Section */
 .hero-section {
-    display: grid;
+    display: flex;
+    justify-content: center;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     padding: 4rem 0;
@@ -124,6 +125,7 @@ body {
 
 .action-buttons {
     display: flex;
+    justify-content: center;
     gap: 1rem;
     margin-top: 2rem;
 }
