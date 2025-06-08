@@ -111,7 +111,7 @@ body {
 /* Buttons */
 .btn-primary {
     display: inline-block;
-    background: #3498db;
+    background: #7ae51c;
     color: white;
     padding: 0.8rem 1.5rem;
     border-radius: 5px;
@@ -120,7 +120,7 @@ body {
 }
 
 .btn-primary:hover {
-    background: #2980b9;
+    background: #d7d7d7;
 }
 
 .action-buttons {
