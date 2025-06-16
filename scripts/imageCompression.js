@@ -25,5 +25,6 @@ async function handleImageCompression(imageFile) {
     const webpBlob = await convertToWebP(imageFile, 0.8); // 0.8 = 80% quality
     const fileName = imageFile.name.replace(/\.[^/.]+$/, "") + ".webp";
     triggerDownload(webpBlob, fileName);
+    resetFileInput();
 }
   

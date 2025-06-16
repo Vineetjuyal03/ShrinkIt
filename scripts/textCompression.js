@@ -118,15 +118,17 @@ function handleFileCompression(file) {
         finalBuffer.set(byteArray, metadataBytes.length);
 
         const blob = new Blob([finalBuffer], { type: 'application/octet-stream' });
-        const downloadLink = document.getElementById("downloadLink");
-        downloadLink.href = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
         let filename = file.name;
-        downloadLink.download = filename.replace(/\.[^/.]+$/, "") + '.shrkt';
-        downloadLink.style.display = "block";
-        downloadLink.click();
-        document.getElementById("fileInput").value = '';
+        a.download = filename.replace(/\.[^/.]+$/, "") + '.shrkt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
     };
     reader.readAsText(file);
+    resetFileInput();
 }
 
 
@@ -181,15 +183,17 @@ function handleFileDecompression(file) {
         const decompressedText = decodeBinary(trimmedBinary, metadata.dMp);
 
         const originalFilename = file.name.replace(/\.shrkt$/, '') + '.' + metadata.fT;
-        const downloadLink = document.getElementById("downloadLink");
+        const a = document.createElement("a");
         const blob = new Blob([decompressedText], { type: shortToFullType[metadata.fT] });
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = originalFilename;
-        downloadLink.style.display = "block";
-        downloadLink.click();
-        document.getElementById("fileInput").value = '';
+        a.href = URL.createObjectURL(blob);
+        a.download = originalFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
     };
 
     reader.readAsArrayBuffer(file);
+    resetFileInput();
 }
 

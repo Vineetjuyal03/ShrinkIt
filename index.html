@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,8 +32,8 @@
                         <p>Drag & Drop files here or</p>
                         <label  for="fileInput"  class="btn btn-primary cursor-pointer inline-block custom-file-label" >
                             <span >Browse Files</span>
-                            <input type="file" id="fileInput" accept=".shrkt, .txt, .png, .jpg, .jpeg, .pdf" class="hidden-file"
-                                onchange="document.getElementById('fileName').textContent = this.files[0]?.name || '';" />
+                            <input type="file" id="fileInput" accept=".shrkt, .txt, .png, .jpg, .jpeg, .pdf, .webp" class="hidden-file"
+                                onchange="showFileName()" />
                         </label>
                         <br>
                         <span id="fileName" class="ml-2 text-sm text-gray-600"></span>
@@ -51,7 +52,14 @@
                     <button id="decompressBtn" class="btn-info">
                         <i class="fas fa-expand"></i> Decompress
                     </button>
+                    <!-- Encrypt Button -->
+                    <button id="encryptBtn" onclick="showCard('encryptCard')">🔐 Encrypt File</button>
+
+                    <!-- Decrypt Button -->
+                    <button id="decryptBtn" onclick="showCard('decryptCard')">🔓 Decrypt File</button>
                 </div>
+
+
             </div>
         </div>
 
@@ -88,13 +96,41 @@
         </div>
     </footer>
 
-    <a id="downloadLink" class="download-btn" style="display: none;" download>
-        <i class="fas fa-download"></i> Download File
-    </a>
+    <div class="card-container" id="card-container">
+        
+        <!-- Encryption Password Suggestion Card -->
+        <div class="card" id="encryptCard">
+            <h2>Set Encryption Password</h2>
+            <input type="text" id="userPassword" placeholder="Enter your password" onkeydown="if(event.key === 'Enter') encrypt()" />
+            
+            <div id="suggestionBox">
+                <p>Suggested Strong Password:</p>
+                <input type="text" id="suggestedPassword" readonly />
+                <div class="suggestion-buttons">
+                    <button onclick="regenerateSuggestion()">Regenerate</button>
+                    <button onclick="useSuggestion()">Use This</button>
+                </div>
+            </div>
+            
+            <button onclick="encrypt()">Confirm</button>
+            <div class="cancel" onclick="hideCard()"> <img src="images/close.svg" alt=""></div>
+        </div>
+        
+        <!-- Decryption Password Card -->
+        <div class="card" id="decryptCard">
+            <h2>Enter Password to Decrypt</h2>
+            <input type="password" id="decryptPassword" placeholder="Enter decryption password" onkeydown="if(event.key === 'Enter') decrypt()" />
+            <button onclick="decrypt()">Decrypt</button>
+            <div class="cancel" onclick="hideCard()" > <img src="images/close.svg" alt=""></div>
+        </div>
+    </div>
+
+    <script src="scripts/encryption.js"></script>
     <script src="scripts/textCompression.js"></script>
     <script src="scripts/imageCompression.js"></script>
-    <script src="scripts/pdfCompression.js"></script> 
+    <script src="scripts/pdfCompression.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/ui.js"></script>
 </body>
+
 </html>
