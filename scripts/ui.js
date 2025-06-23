@@ -36,4 +36,25 @@ function resetFileInput() {
   document.getElementById("fileName").textContent = "";
 }
 
+const dropZone = document.getElementById('dropZone');
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragging');
+});
+
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragging');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragging');
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        document.getElementById('fileInput').files = files;
+        showFileName();
+    }
+});
 

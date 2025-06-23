@@ -356,4 +356,7 @@ body {
     background-color: #0056b3;
   }
 
-  
+  .dragging {
+    border: 2px dashed #00f;
+    background-color: #f0f8ff;
+}
